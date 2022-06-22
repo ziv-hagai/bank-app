@@ -7,7 +7,7 @@ import useStyles from './styles';
 import { createPost, updatePost } from '../../actions/posts';
 
 const Form = ({ currentId, setCurrentId }) => {
-  const [postData, setPostData] = useState({ clientName: '', city: '', balance: '', haveMortgage: '', numCreditCards : '', selectedFile: '' });
+  const [postData, setPostData] = useState({ clientName: '', city: '', balance: '', haveMortgage: '', numCreditCards: '', selectedFile: '' });
   const post = useSelector((state) => (currentId ? state.posts.find((message) => message._id === currentId) : null));
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -18,7 +18,7 @@ const Form = ({ currentId, setCurrentId }) => {
 
   const clear = () => {
     setCurrentId(0);
-    setPostData({ clientName: '', city: '', balance: '', haveMortgage: '', numCreditCards : '', selectedFile: '' });
+    setPostData({ clientName: '', city: '', balance: '', haveMortgage: '', numCreditCards: '', selectedFile: '' });
   };
 
   const handleSubmit = async (e) => {
