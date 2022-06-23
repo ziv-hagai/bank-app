@@ -13,12 +13,12 @@ const Filter = ({ setCurrentId }) => {
   const [first, setFirst] = useState('&&');
 
   const [isBalance, setIsBalance] = useState(true);
-  const [balance, setBalance] = useState([0, 100000]);
+  const [balanced, setBalanced] = useState([0, 100000]);
 
   const [second, setSecond] = useState('&&');
 
   const [isMortgage, setIsMortgage] = useState(true);
-  const [mortgage, setMortgage] = useState('');
+  const [mortgage, setMortgage] = useState(['Yes', 'No']);
 
   const [third, setThird] = useState('&&');
 
@@ -46,7 +46,7 @@ const Filter = ({ setCurrentId }) => {
   };
 
   const changeBalance = (event, newValue) => {
-    setBalance(newValue);
+    setBalanced(newValue);
   };
 
   const checkBalance = (event) => {
@@ -59,8 +59,8 @@ const Filter = ({ setCurrentId }) => {
   };
 
   const changeMortgage = (e) => {
-    console.log(e.target.value);
     setMortgage(e.target.value);
+    console.log(mortgage);
   };
 
   const checkMortgage = () => {
@@ -82,22 +82,30 @@ const Filter = ({ setCurrentId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // const req = { citiesFilter: isCities ? [] : cities, isFirst: first, balanceFilter: isBalance ? [] : balance, isSecond: second, mortgageFilter: isMortgage ? [] : mortgage, isThird: third, cardsFilter: isCards ? [] : cards };
-    // console.log(req);
+    const req = { citiesFilter: isCities ? allCities : cities, isFirst: first, balanceFilter: isBalance ? [] : balanced, isSecond: second, mortgageFilter: isMortgage ? [] : mortgage, isThird: third, cardsFilter: isCards ? [] : cards };
+    console.log(req);
+    console.log(filtered);
 
-    const newFiltered = isCards ? [...posts] : posts.filter((post) => cards.includes(post.numCreditCards));
+    // const newFiltered = isCards ? [...posts] : posts.filter((post) => cards.includes(post.numCreditCards));
+
+    const newFiltered = posts
+      .filter(({ city, balance, haveMortgage, numCreditCards }) => req.citiesFilter.includes(city)
+        && balance >= balanced[0] && balance <= balanced[1]
+        && mortgage.includes(haveMortgage)
+        && numCreditCards >= cards[0] && numCreditCards <= cards[1]);
     setFiltered(newFiltered);
 
-    // const newFiltered = cards === -1 ? [...posts] : posts.filter((post) => post.numCreditCards === cards);
-    // setFiltered(newFiltered);
+    // balance: "20000"
+    // city: "Kiev"
+    // haveMortgage: "Yes"
+    // numCreditCards: 2
   };
 
   return (
     <div>
       <form onSubmit={(e) => handleSubmit(e)}>
-
+        <Checkbox onChange={checkCities} />
         <InputLabel id="cities-label">Cities
-          <Checkbox onChange={checkCities} />
           <Select
             value={cities}
             multiple
@@ -109,13 +117,11 @@ const Filter = ({ setCurrentId }) => {
             ))}
           </Select>
         </InputLabel>
-
         <Button id="first" type="button" onClick={changeFirst}>{first === '&&' ? 'And' : 'Or'}</Button>
-
+        <Checkbox onChange={checkBalance} />
         <InputLabel id="balance-label">Balance
-          <Checkbox onChange={checkBalance} />
           <Slider
-            value={balance}
+            value={balanced}
             onChange={changeBalance}
             valueLabelDisplay="auto"
             marks
@@ -126,9 +132,8 @@ const Filter = ({ setCurrentId }) => {
           />
         </InputLabel>
         <Button id="second" type="button" onClick={changeSecond}>{second === '&&' ? 'And' : 'Or'}</Button>
-
+        <Checkbox onChange={checkMortgage} />
         <InputLabel id="mortgage-label">Mortgage
-          <Checkbox onChange={checkMortgage} />
           <Select
             value={mortgage}
             onChange={changeMortgage}
@@ -140,9 +145,8 @@ const Filter = ({ setCurrentId }) => {
         </InputLabel>
 
         <Button id="third" type="button" onClick={changeThird}>{third === '&&' ? 'And' : 'Or'}</Button>
-
+        <Checkbox onChange={checkCards} />
         <InputLabel id="cards-label">Number of Credit Cards
-          <Checkbox onChange={checkCards} />
           <Slider
             value={cards}
             onChange={changeCards}
@@ -154,7 +158,6 @@ const Filter = ({ setCurrentId }) => {
             disabled={isCards}
           />
         </InputLabel>
-
         <Button type="submit">Filter</Button>
       </form>
       <Posts filtered={filtered} setCurrentId={setCurrentId} />
