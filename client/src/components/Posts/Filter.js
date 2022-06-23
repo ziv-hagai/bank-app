@@ -1,32 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Select, MenuItem, InputLabel, Slider } from '@material-ui/core';
+import { Button, InputLabel, Slider, Checkbox, Select, MenuItem } from '@material-ui/core';
 import Posts from './Posts';
 
 const Filter = ({ setCurrentId }) => {
   const posts = useSelector((state) => state.posts);
-  const [cards, setCards] = useState(-1);
-  const [filtered, setFiltered] = useState([]);
-  const [first, setFirst] = useState(true);
+  const [isCards, setIsCards] = useState(true);
+  const [cards, setCards] = useState([0, 5]);
+  const [first, setFirst] = useState('&&');
+  const [isBalance, setIsBalance] = useState(true);
   const [balance, setBalance] = useState([0, 100000]);
-
-  const changeBalance = (event, newValue) => {
-    setBalance(newValue);
-    console.log(balance);
-  };
+  const [second, setSecond] = useState('&&');
+  const [isMortgage, setIsMortgage] = useState(true);
+  const [mortgage, setMortgage] = useState();
+  const [allCities, setAllCities] = useState([]);
+  const [isCities, setIsCities] = useState(true);
+  const [cities, setCities] = useState([]);
+  const [filtered, setFiltered] = useState([]);
 
   useEffect(() => {
     setFiltered([...posts]);
+    setAllCities([...new Set(posts.map((post) => post.city).sort())]);
   }, [posts]);
 
-  const changeCards = (e) => {
-    e.preventDefault();
-    setCards(e.target.value);
+  const changeCards = (event, newValue) => {
+    setCards(newValue);
   };
 
-  const changeFirst = (e) => {
-    e.preventDefault();
-    setFirst(!first);
+  const checkCards = () => {
+    setIsCards(!isCards);
+  };
+
+  const changeFirst = () => {
+    setFirst(first === '&&' ? '||' : '&&');
+  };
+
+  const changeBalance = (event, newValue) => {
+    setBalance(newValue);
+  };
+
+  const checkBalance = () => {
+    setIsBalance(!isBalance);
+  };
+
+  const changeSecond = () => {
+    setSecond(second === '&&' ? '||' : '&&');
+  };
+
+  const changeMortgage = (event, newValue) => {
+    setMortgage(newValue);
+  };
+
+  const checkMortgage = () => {
+    setIsMortgage(!isMortgage);
+  };
+
+  const changeCities = (e) => {
+    setCities(e.target.value);
+  };
+
+  const checkCities = () => {
+    setIsCities(!isCities);
   };
 
   const handleSubmit = (e) => {
@@ -38,34 +72,67 @@ const Filter = ({ setCurrentId }) => {
   return (
     <div>
       <form onSubmit={(e) => handleSubmit(e)}>
-        <InputLabel id="cards-label">Number of Credit Cards</InputLabel>
-        <Select
-          id="cards"
-          labelId="cards-label"
-          value={cards}
-          label="cards"
-          onChange={changeCards}
-        >
-          <MenuItem value={-1}>All</MenuItem>
-          <MenuItem value={0}>0</MenuItem>
-          <MenuItem value={1}>1</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={4}>4</MenuItem>
-          <MenuItem value={5}>5</MenuItem>
-        </Select>
-        <Button type="button" onClick={changeFirst}>{first ? 'And' : 'Or'}</Button>
+        <InputLabel id="cards-label">Number of Credit Cards
+          <Checkbox
+            onChange={checkCards}
+          /><Slider
+            control={<Checkbox defaultChecked />}
+            value={cards}
+            onChange={changeCards}
+            valueLabelDisplay="auto"
+            marks
+            min={0}
+            max={5}
+            step={1}
+            disabled={isCards}
+          />
+        </InputLabel>
+        <Button type="button" onClick={changeFirst}>{first === '&&' ? 'And' : 'Or'}</Button>
+        <InputLabel id="balance-label">Balance
+          <Checkbox
+            onChange={checkBalance}
+          />
+          <Slider
+            value={balance}
+            onChange={changeBalance}
+            valueLabelDisplay="auto"
+            marks
+            min={0}
+            max={100000}
+            step={10000}
+            disabled={isBalance}
+          />
+        </InputLabel>
+        <Button type="button" onClick={changeSecond}>{second === '&&' ? 'And' : 'Or'}</Button>
+        <InputLabel id="mortgage-label">Mortgage
+          <Checkbox
+            onChange={checkMortgage}
+          />
+          <Select
+            value={mortgage}
+            onChange={changeMortgage}
+            disabled={isMortgage}
+          >
+            <MenuItem value="Yes">Yes</MenuItem>
+            <MenuItem value="No">No</MenuItem>
+          </Select>
+        </InputLabel>
+        <InputLabel id="cities-label">Cities
+          <Checkbox
+            onChange={checkCities}
+          />
+          <Select
+            value={cities}
+            multiple
+            onChange={changeCities}
+            disabled={isCities}
+          >
+            {allCities.map((city, index) => (
+              <MenuItem key={index} value={city}>{city}</MenuItem>
+            ))}
+          </Select>
+        </InputLabel>
         <Button type="submit">Filter</Button>
-        <Slider
-          getAriaLabel={() => 'Temperature range'}
-          value={balance}
-          onChange={changeBalance}
-          valueLabelDisplay="auto"
-          marks
-          min={0}
-          max={100000}
-          step={10000}
-        />
       </form>
       <Posts filtered={filtered} setCurrentId={setCurrentId} />
     </div>
