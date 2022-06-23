@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Button, TextField, Select, MenuItem, InputLabel } from '@material-ui/core';
+import { Button, Select, MenuItem, InputLabel, Slider } from '@material-ui/core';
 import Posts from './Posts';
-// import Stack from '@mui/material/Stack';
-// import Button from '@mui/material/Button';
 
 const Filter = ({ setCurrentId }) => {
   const posts = useSelector((state) => state.posts);
   const [cards, setCards] = useState(-1);
   const [filtered, setFiltered] = useState([]);
   const [first, setFirst] = useState(true);
+  const [balance, setBalance] = useState([0, 100000]);
+
+  const changeBalance = (event, newValue) => {
+    setBalance(newValue);
+    console.log(balance);
+  };
 
   useEffect(() => {
     setFiltered([...posts]);
@@ -50,11 +54,18 @@ const Filter = ({ setCurrentId }) => {
           <MenuItem value={4}>4</MenuItem>
           <MenuItem value={5}>5</MenuItem>
         </Select>
-        <TextField />
-
         <Button type="button" onClick={changeFirst}>{first ? 'And' : 'Or'}</Button>
         <Button type="submit">Filter</Button>
-
+        <Slider
+          getAriaLabel={() => 'Temperature range'}
+          value={balance}
+          onChange={changeBalance}
+          valueLabelDisplay="auto"
+          marks
+          min={0}
+          max={100000}
+          step={10000}
+        />
       </form>
       <Posts filtered={filtered} setCurrentId={setCurrentId} />
     </div>
