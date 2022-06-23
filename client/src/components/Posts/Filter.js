@@ -5,17 +5,26 @@ import Posts from './Posts';
 
 const Filter = ({ setCurrentId }) => {
   const posts = useSelector((state) => state.posts);
-  const [isCards, setIsCards] = useState(true);
-  const [cards, setCards] = useState([0, 5]);
-  const [first, setFirst] = useState('&&');
-  const [isBalance, setIsBalance] = useState(true);
-  const [balance, setBalance] = useState([0, 100000]);
-  const [second, setSecond] = useState('&&');
-  const [isMortgage, setIsMortgage] = useState(true);
-  const [mortgage, setMortgage] = useState();
+
   const [allCities, setAllCities] = useState([]);
   const [isCities, setIsCities] = useState(true);
   const [cities, setCities] = useState([]);
+
+  const [first, setFirst] = useState('&&');
+
+  const [isBalance, setIsBalance] = useState(true);
+  const [balance, setBalance] = useState([0, 100000]);
+
+  const [second, setSecond] = useState('&&');
+
+  const [isMortgage, setIsMortgage] = useState(true);
+  const [mortgage, setMortgage] = useState('');
+
+  const [third, setThird] = useState('&&');
+
+  const [isCards, setIsCards] = useState(true);
+  const [cards, setCards] = useState([0, 5]);
+
   const [filtered, setFiltered] = useState([]);
 
   useEffect(() => {
@@ -23,12 +32,13 @@ const Filter = ({ setCurrentId }) => {
     setAllCities([...new Set(posts.map((post) => post.city).sort())]);
   }, [posts]);
 
-  const changeCards = (event, newValue) => {
-    setCards(newValue);
+  const changeCities = (e) => {
+    setCities(e.target.value);
+    console.log(cities);
   };
 
-  const checkCards = () => {
-    setIsCards(!isCards);
+  const checkCities = () => {
+    setIsCities(!isCities);
   };
 
   const changeFirst = () => {
@@ -39,7 +49,8 @@ const Filter = ({ setCurrentId }) => {
     setBalance(newValue);
   };
 
-  const checkBalance = () => {
+  const checkBalance = (event) => {
+    event.preventDefault();
     setIsBalance(!isBalance);
   };
 
@@ -47,80 +58,46 @@ const Filter = ({ setCurrentId }) => {
     setSecond(second === '&&' ? '||' : '&&');
   };
 
-  const changeMortgage = (event, newValue) => {
-    setMortgage(newValue);
+  const changeMortgage = (e) => {
+    console.log(e.target.value);
+    setMortgage(e.target.value);
   };
 
   const checkMortgage = () => {
     setIsMortgage(!isMortgage);
   };
 
-  const changeCities = (e) => {
-    setCities(e.target.value);
+  const changeThird = () => {
+    setThird(third === '&&' ? '||' : '&&');
   };
 
-  const checkCities = () => {
-    setIsCities(!isCities);
+  const changeCards = (event, newValue) => {
+    setCards(newValue);
+  };
+
+  const checkCards = (event) => {
+    event.preventDefault();
+    setIsCards(!isCards);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newFiltered = cards === -1 ? [...posts] : posts.filter((post) => post.numCreditCards === cards);
+    // const req = { citiesFilter: isCities ? [] : cities, isFirst: first, balanceFilter: isBalance ? [] : balance, isSecond: second, mortgageFilter: isMortgage ? [] : mortgage, isThird: third, cardsFilter: isCards ? [] : cards };
+    // console.log(req);
+
+    const newFiltered = isCards ? [...posts] : posts.filter((post) => cards.includes(post.numCreditCards));
     setFiltered(newFiltered);
+
+    // const newFiltered = cards === -1 ? [...posts] : posts.filter((post) => post.numCreditCards === cards);
+    // setFiltered(newFiltered);
   };
 
   return (
     <div>
       <form onSubmit={(e) => handleSubmit(e)}>
-        <InputLabel id="cards-label">Number of Credit Cards
-          <Checkbox
-            onChange={checkCards}
-          /><Slider
-            control={<Checkbox defaultChecked />}
-            value={cards}
-            onChange={changeCards}
-            valueLabelDisplay="auto"
-            marks
-            min={0}
-            max={5}
-            step={1}
-            disabled={isCards}
-          />
-        </InputLabel>
-        <Button type="button" onClick={changeFirst}>{first === '&&' ? 'And' : 'Or'}</Button>
-        <InputLabel id="balance-label">Balance
-          <Checkbox
-            onChange={checkBalance}
-          />
-          <Slider
-            value={balance}
-            onChange={changeBalance}
-            valueLabelDisplay="auto"
-            marks
-            min={0}
-            max={100000}
-            step={10000}
-            disabled={isBalance}
-          />
-        </InputLabel>
-        <Button type="button" onClick={changeSecond}>{second === '&&' ? 'And' : 'Or'}</Button>
-        <InputLabel id="mortgage-label">Mortgage
-          <Checkbox
-            onChange={checkMortgage}
-          />
-          <Select
-            value={mortgage}
-            onChange={changeMortgage}
-            disabled={isMortgage}
-          >
-            <MenuItem value="Yes">Yes</MenuItem>
-            <MenuItem value="No">No</MenuItem>
-          </Select>
-        </InputLabel>
+
         <InputLabel id="cities-label">Cities
-          <Checkbox
-            onChange={checkCities}
-          />
+          <Checkbox onChange={checkCities} />
           <Select
             value={cities}
             multiple
@@ -132,6 +109,52 @@ const Filter = ({ setCurrentId }) => {
             ))}
           </Select>
         </InputLabel>
+
+        <Button id="first" type="button" onClick={changeFirst}>{first === '&&' ? 'And' : 'Or'}</Button>
+
+        <InputLabel id="balance-label">Balance
+          <Checkbox onChange={checkBalance} />
+          <Slider
+            value={balance}
+            onChange={changeBalance}
+            valueLabelDisplay="auto"
+            marks
+            min={0}
+            max={100000}
+            step={10000}
+            disabled={isBalance}
+          />
+        </InputLabel>
+        <Button id="second" type="button" onClick={changeSecond}>{second === '&&' ? 'And' : 'Or'}</Button>
+
+        <InputLabel id="mortgage-label">Mortgage
+          <Checkbox onChange={checkMortgage} />
+          <Select
+            value={mortgage}
+            onChange={changeMortgage}
+            disabled={isMortgage}
+          >
+            <MenuItem value="Yes">Yes</MenuItem>
+            <MenuItem value="No">No</MenuItem>
+          </Select>
+        </InputLabel>
+
+        <Button id="third" type="button" onClick={changeThird}>{third === '&&' ? 'And' : 'Or'}</Button>
+
+        <InputLabel id="cards-label">Number of Credit Cards
+          <Checkbox onChange={checkCards} />
+          <Slider
+            value={cards}
+            onChange={changeCards}
+            valueLabelDisplay="auto"
+            marks
+            min={0}
+            max={5}
+            step={1}
+            disabled={isCards}
+          />
+        </InputLabel>
+
         <Button type="submit">Filter</Button>
       </form>
       <Posts filtered={filtered} setCurrentId={setCurrentId} />
