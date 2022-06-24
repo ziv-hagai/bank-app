@@ -82,17 +82,28 @@ const Filter = ({ setCurrentId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const req = { citiesFilter: isCities ? allCities : cities, isFirst: first, balanceFilter: isBalance ? [] : balanced, isSecond: second, mortgageFilter: isMortgage ? [] : mortgage, isThird: third, cardsFilter: isCards ? [] : cards };
+    const req = {
+      citiesFilter: isCities ? allCities : cities,
+      isFirst: first,
+      balanceFilter: isBalance ? [0, 100000] : balanced,
+      isSecond: second,
+      mortgageFilter: isMortgage ? ['Yes', 'No'] : mortgage,
+      isThird: third,
+      cardsFilter: isCards ? [0, 5] : cards,
+    };
     console.log(req);
-    console.log(filtered);
-
     // const newFiltered = isCards ? [...posts] : posts.filter((post) => cards.includes(post.numCreditCards));
 
-    const newFiltered = posts
-      .filter(({ city, balance, haveMortgage, numCreditCards }) => req.citiesFilter.includes(city)
+    function filterFunc({ city, balance, haveMortgage, numCreditCards }) {
+      return req.citiesFilter.includes(city)
         && balance >= balanced[0] && balance <= balanced[1]
         && mortgage.includes(haveMortgage)
-        && numCreditCards >= cards[0] && numCreditCards <= cards[1]);
+        && numCreditCards >= cards[0] && numCreditCards <= cards[1];
+    }
+
+    const newFiltered = posts.filter(filterFunc);
+    console.log(posts);
+    console.log(newFiltered);
     setFiltered(newFiltered);
 
     // balance: "20000"
