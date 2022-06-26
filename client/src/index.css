@@ -3,8 +3,8 @@ body {
 }
 
 #filter {
-    padding: 5%;
-    margin: 5% 0;
+    padding: 3% 10%;
+    margin-bottom: 5%;
 }
 
 Form>Button {

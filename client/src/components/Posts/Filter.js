@@ -20,7 +20,30 @@ const Filter = ({ setCurrentId }) => {
   const [isCards, setIsCards] = useState(false);
   const [cards, setCards] = useState([0, 5]);
   const [filtered, setFiltered] = useState([]);
-
+  const balanceMarks = [
+    {
+      value: 0,
+      label: '0',
+    },
+    {
+      value: 50000,
+      label: '50,000',
+    },
+    {
+      value: 100000,
+      label: '100,000',
+    },
+  ];
+  const cardsMarks = [
+    {
+      value: 0,
+      label: '0',
+    },
+    {
+      value: 5,
+      label: '5',
+    },
+  ];
   useEffect(() => {
     setFiltered([...posts]);
     setAllCities([...new Set(posts.map((post) => post.city).sort())]);
@@ -76,7 +99,7 @@ const Filter = ({ setCurrentId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const req = {
-      citiesFilter: isCities ? cities : allCities,
+      citiesFilter: isCities && cities.length ? cities : allCities,
       isFirst: first,
       balanceFilter: isBalance ? balanced : [0, 100000],
       isSecond: second,
@@ -126,7 +149,7 @@ const Filter = ({ setCurrentId }) => {
             value={balanced}
             onChange={changeBalance}
             valueLabelDisplay="auto"
-            marks
+            marks={balanceMarks}
             min={0}
             max={100000}
             step={10000}
@@ -148,7 +171,7 @@ const Filter = ({ setCurrentId }) => {
             value={cards}
             onChange={changeCards}
             valueLabelDisplay="auto"
-            marks
+            marks={cardsMarks}
             min={0}
             max={5}
             step={1}
