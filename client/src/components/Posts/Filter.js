@@ -8,16 +8,16 @@ const Filter = ({ setCurrentId }) => {
   const classes = useStyles();
   const posts = useSelector((state) => state.posts);
   const [allCities, setAllCities] = useState([]);
-  const [isCities, setIsCities] = useState(true);
+  const [isCities, setIsCities] = useState(false);
   const [cities, setCities] = useState([]);
-  const [first, setFirst] = useState('&&');
-  const [isBalance, setIsBalance] = useState(true);
+  const [first, setFirst] = useState(true);
+  const [isBalance, setIsBalance] = useState(false);
   const [balanced, setBalanced] = useState([0, 100000]);
-  const [second, setSecond] = useState('&&');
-  const [isMortgage, setIsMortgage] = useState(true);
+  const [second, setSecond] = useState(true);
+  const [isMortgage, setIsMortgage] = useState(false);
   const [mortgage, setMortgage] = useState(['Yes', 'No']);
-  const [third, setThird] = useState('&&');
-  const [isCards, setIsCards] = useState(true);
+  const [third, setThird] = useState(true);
+  const [isCards, setIsCards] = useState(false);
   const [cards, setCards] = useState([0, 5]);
   const [filtered, setFiltered] = useState([]);
 
@@ -28,7 +28,6 @@ const Filter = ({ setCurrentId }) => {
 
   const changeCities = (e) => {
     setCities(e.target.value);
-    console.log(cities);
   };
 
   const checkCities = () => {
@@ -36,7 +35,7 @@ const Filter = ({ setCurrentId }) => {
   };
 
   const changeFirst = () => {
-    setFirst(first === '&&' ? '||' : '&&');
+    setFirst(!first);
   };
 
   const changeBalance = (event, newValue) => {
@@ -49,7 +48,7 @@ const Filter = ({ setCurrentId }) => {
   };
 
   const changeSecond = () => {
-    setSecond(second === '&&' ? '||' : '&&');
+    setSecond(!second);
   };
 
   const changeMortgage = (e) => {
@@ -62,7 +61,7 @@ const Filter = ({ setCurrentId }) => {
   };
 
   const changeThird = () => {
-    setThird(third === '&&' ? '||' : '&&');
+    setThird(!third);
   };
 
   const changeCards = (event, newValue) => {
@@ -77,34 +76,31 @@ const Filter = ({ setCurrentId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const req = {
-      citiesFilter: isCities ? allCities : cities,
+      citiesFilter: isCities ? cities : allCities,
       isFirst: first,
-      balanceFilter: isBalance ? [0, 100000] : balanced,
+      balanceFilter: isBalance ? balanced : [0, 100000],
       isSecond: second,
-      mortgageFilter: isMortgage ? ['Yes', 'No'] : mortgage,
+      mortgageFilter: isMortgage ? mortgage : ['Yes', 'No'],
       isThird: third,
-      cardsFilter: isCards ? [0, 5] : cards,
+      cardsFilter: isCards ? cards : [0, 5],
     };
     console.log(req);
 
-    // function filterFunc({ city, balance, haveMortgage, numCreditCards }) {
+    function filterCities({ city }) { return req.citiesFilter.includes(city); }
+    function filterBalance({ balance }) { return balance >= balanced[0] && balance <= balanced[1]; }
+    function filterMortgage({ haveMortgage }) { return mortgage.includes(haveMortgage); }
+    function filterCards({ numCreditCards }) { return numCreditCards >= cards[0] && numCreditCards <= cards[1]; }
 
-    //   function filterCities(city) {
-    //     return (req.citiesFilter.includes(city));
-    //   };
+    let newFiltered = isCities ? posts.filter(filterCities) : posts;
 
-    // };
-    // const newFiltered = isCards ? [...posts] : posts.filter((post) => cards.includes(post.numCreditCards));
+    if (isBalance) { newFiltered = req.isFirst ? newFiltered.filter(filterBalance) : newFiltered.concat(posts.filter(filterBalance)); }
+    console.log(isMortgage);
+    if (isMortgage) { newFiltered = req.isSecond ? newFiltered.filter(filterMortgage) : newFiltered.concat(posts.filter(filterMortgage)); }
 
-    function filterFunc({ city, balance, haveMortgage, numCreditCards }) {
-      return (req.citiesFilter.includes(city))
-        && balance >= balanced[0] && balance <= balanced[1]
-        && mortgage.includes(haveMortgage)
-        && numCreditCards >= cards[0] && numCreditCards <= cards[1];
-    }
+    if (isCards) { newFiltered = req.isThird ? newFiltered.filter(filterCards) : newFiltered.concat(posts.filter(filterCards)); }
+    console.log(newFiltered);
 
-    const newFiltered = posts.filter(filterFunc);
-    console.log(posts);
+    newFiltered = newFiltered.filter((item, index) => (newFiltered.indexOf(item) === index));
     console.log(newFiltered);
     setFiltered(newFiltered);
   };
@@ -118,13 +114,13 @@ const Filter = ({ setCurrentId }) => {
             value={cities}
             multiple
             onChange={changeCities}
-            disabled={isCities}
+            disabled={!isCities}
           >
             {allCities.map((city, index) => (
               <MenuItem key={index} value={city}>{city}</MenuItem>
             ))}
           </Select>
-          <Button disabled={isBalance} size="small" id="first" variant="contained" color="primary" type="button" onClick={changeFirst}>{first === '&&' ? 'And' : 'Or'} </Button>
+          <Button disabled={!isBalance} size="small" id="first" variant="contained" color="primary" type="button" onClick={changeFirst}>{first ? 'And' : 'Or'} </Button>
           <InputLabel id="balance-label"><Checkbox onChange={checkBalance} />Balance</InputLabel>
           <Slider
             value={balanced}
@@ -134,19 +130,19 @@ const Filter = ({ setCurrentId }) => {
             min={0}
             max={100000}
             step={10000}
-            disabled={isBalance}
+            disabled={!isBalance}
           />
-          <Button disabled={isMortgage} size="small" id="second" variant="contained" color="primary" type="button" onClick={changeSecond}>{second === '&&' ? 'And' : 'Or'}</Button>
+          <Button disabled={!isMortgage} size="small" id="second" variant="contained" color="primary" type="button" onClick={changeSecond}>{second ? 'And' : 'Or'}</Button>
           <InputLabel id="mortgage-label"><Checkbox onChange={checkMortgage} />Mortgage</InputLabel>
           <Select
             value={mortgage}
             onChange={changeMortgage}
-            disabled={isMortgage}
+            disabled={!isMortgage}
           >
             <MenuItem value="Yes">Yes</MenuItem>
             <MenuItem value="No">No</MenuItem>
           </Select>
-          <Button disabled={isCards} size="small" id="third" variant="contained" color="primary" type="button" onClick={changeThird}>{third === '&&' ? 'And' : 'Or'}</Button>
+          <Button disabled={!isCards} size="small" id="third" variant="contained" color="primary" type="button" onClick={changeThird}>{third ? 'And' : 'Or'}</Button>
           <InputLabel id="cards-label"><Checkbox onChange={checkCards} />Number of Credit Cards</InputLabel>
           <Slider
             value={cards}
@@ -156,9 +152,8 @@ const Filter = ({ setCurrentId }) => {
             min={0}
             max={5}
             step={1}
-            disabled={isCards}
+            disabled={!isCards}
           />
-
           <Button size="large" type="submit" variant="contained" color="secondary">Filter</Button>
         </form>
       </Paper>
