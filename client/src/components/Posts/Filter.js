@@ -76,7 +76,6 @@ const Filter = ({ setCurrentId }) => {
 
   const changeMortgage = (e) => {
     setMortgage(e.target.value);
-    console.log(mortgage);
   };
 
   const checkMortgage = () => {
@@ -107,7 +106,6 @@ const Filter = ({ setCurrentId }) => {
       isThird: third,
       cardsFilter: isCards ? cards : [0, 5],
     };
-    console.log(req);
 
     function filterCities({ city }) { return req.citiesFilter.includes(city); }
     function filterBalance({ balance }) { return balance >= balanced[0] && balance <= balanced[1]; }
@@ -117,14 +115,11 @@ const Filter = ({ setCurrentId }) => {
     let newFiltered = isCities ? posts.filter(filterCities) : posts;
 
     if (isBalance) { newFiltered = req.isFirst ? newFiltered.filter(filterBalance) : newFiltered.concat(posts.filter(filterBalance)); }
-    console.log(isMortgage);
     if (isMortgage) { newFiltered = req.isSecond ? newFiltered.filter(filterMortgage) : newFiltered.concat(posts.filter(filterMortgage)); }
 
     if (isCards) { newFiltered = req.isThird ? newFiltered.filter(filterCards) : newFiltered.concat(posts.filter(filterCards)); }
-    console.log(newFiltered);
 
     newFiltered = newFiltered.filter((item, index) => (newFiltered.indexOf(item) === index));
-    console.log(newFiltered);
     setFiltered(newFiltered);
   };
 
